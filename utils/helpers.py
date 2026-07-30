@@ -850,12 +850,109 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
         box-shadow: 0 0 0 1px #FF5C00 !important;
     }}
 
-    /* Native Streamlit File Uploader Light Text Visibility */
-    div[data-testid="stFileUploader"] span,
-    div[data-testid="stFileUploader"] small,
-    div[data-testid="stFileUploader"] p,
+    /* Streamlit File Uploader Custom Light Theme (Matches Reference Screenshot) */
+    div[data-testid="stFileUploader"] {{
+        background-color: #FFFFFF !important;
+        border-radius: 12px !important;
+        padding: 0.8rem 1.2rem !important;
+        box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
+        border: 1px solid #E2E8F0 !important;
+    }}
+
     div[data-testid="stFileUploader"] label {{
         color: #0F172A !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        margin-bottom: 0.6rem !important;
+    }}
+
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {{
+        background-color: #F8FAFC !important;
+        border: 1px dashed #CBD5E1 !important;
+        border-radius: 8px !important;
+        padding: 1.2rem 1.5rem !important;
+        transition: all 0.2s ease-in-out !important;
+    }}
+
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"]:hover {{
+        border-color: #FF5C00 !important;
+        background-color: #FFF8F5 !important;
+    }}
+
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] span,
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] p,
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] div {{
+        color: #0F172A !important;
+    }}
+
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] small {{
+        color: #64748B !important;
+    }}
+
+    /* Orange Cloud Upload Icon */
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] svg {{
+        fill: #FF5C00 !important;
+        color: #FF5C00 !important;
+    }}
+
+    /* Browse files button styling (White bg, Orange border & text) */
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] button {{
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        color: #FF5C00 !important;
+        border: 1px solid #FF5C00 !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        padding: 0.45rem 1.2rem !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    }}
+
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] button:hover {{
+        background-color: #FF5C00 !important;
+        background: #FF5C00 !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 4px 12px rgba(255, 92, 0, 0.25) !important;
+    }}
+
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] button * {{
+        color: #FF5C00 !important;
+    }}
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] button:hover * {{
+        color: #FFFFFF !important;
+    }}
+
+    /* Uploaded file item pill */
+    div[data-testid="stFileUploaderFileData"],
+    div[data-testid="stFileUploaderFile"],
+    div[data-testid="stUploadedFileData"],
+    ul[data-testid="stFileUploaderUserUploadedFiles"] li,
+    div[data-testid="stFileUploader"] ul li,
+    [data-testid="stFileUploaderFile"] {{
+        background-color: #F8FAFC !important;
+        background: #F8FAFC !important;
+        color: #0F172A !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 8px !important;
+    }}
+
+    div[data-testid="stFileUploaderFileData"] *,
+    div[data-testid="stFileUploaderFile"] *,
+    [data-testid="stFileUploaderFileName"] {{
+        color: #0F172A !important;
+    }}
+
+    button[data-testid="stFileUploaderDeleteBtn"],
+    div[data-testid="stFileUploaderFileData"] button {{
+        background-color: #FFFFFF !important;
+        border: 1px solid #CBD5E1 !important;
+        color: #FF5C00 !important;
+        border-radius: 6px !important;
+    }}
+    button[data-testid="stFileUploaderDeleteBtn"]:hover {{
+        background-color: #FFF8F5 !important;
+        border-color: #FF5C00 !important;
     }}
 
     /* Streamlit Expander (st.expander) Light Executive Theme Override */
