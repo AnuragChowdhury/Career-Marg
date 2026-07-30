@@ -85,6 +85,45 @@ def init_session_state(st_session_state: Any) -> None:
         if key not in st_session_state:
             st_session_state[key] = value
 
+    # Auto-load active candidate profile across multi-page navigation if active candidate file exists
+    if st_session_state["candidate_profile"] is None:
+        try:
+            active_file = os.path.join("data", "active_candidate_id.txt")
+            if os.path.exists(active_file):
+                with open(active_file, "r") as f:
+                    c_id_str = f.read().strip()
+                if c_id_str:
+                    c_id = int(c_id_str)
+                    st_session_state["candidate_id"] = c_id
+                    
+                    from data.database import SessionLocal, CandidateRecord, JobAnalysisRecord
+                    from models.schemas import CandidateProfile, DocumentAnalysis, ATSResult, SkillGapResult
+                    
+                    db_session = SessionLocal()
+                    try:
+                        rec = db_session.query(CandidateRecord).filter(CandidateRecord.id == c_id).first()
+                        if rec:
+                            st_session_state["candidate_profile"] = CandidateProfile.parse_raw(rec.profile_json)
+                            st_session_state["raw_ocr_text"] = rec.raw_text or ""
+                            st_session_state["document_analysis"] = DocumentAnalysis.parse_raw(rec.doc_analysis_json)
+                            
+                            # Query latest associated job analysis
+                            job_rec = db_session.query(JobAnalysisRecord).filter(
+                                JobAnalysisRecord.candidate_id == c_id
+                            ).order_by(JobAnalysisRecord.id.desc()).first()
+                            
+                            if job_rec:
+                                st_session_state["target_job_role"] = job_rec.target_role or ""
+                                st_session_state["job_description"] = job_rec.job_description or ""
+                                if job_rec.ats_result_json and job_rec.ats_result_json != "{}":
+                                    st_session_state["ats_result"] = ATSResult.parse_raw(job_rec.ats_result_json)
+                                if job_rec.skill_gap_json and job_rec.skill_gap_json != "{}":
+                                    st_session_state["skill_gap_result"] = SkillGapResult.parse_raw(job_rec.skill_gap_json)
+                    finally:
+                        db_session.close()
+        except Exception:
+            pass
+
 
 def reset_session_state(st_session_state: Any) -> None:
     """

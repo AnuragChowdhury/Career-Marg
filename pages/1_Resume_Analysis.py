@@ -77,6 +77,8 @@ if uploaded_file is not None:
                         doc_analysis_dict=doc_analysis.dict()
                     )
                     st.session_state.candidate_id = c_id
+                    with open(os.path.join("data", "active_candidate_id.txt"), "w") as f:
+                        f.write(str(c_id))
                 except Exception:
                     pass
 
