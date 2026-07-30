@@ -2,6 +2,9 @@
 
 > **Tagline:** *Apne Career ko do Raasta*
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://career-marg.streamlit.app/)
+🚀 **Live Web Application:** [https://career-marg.streamlit.app/](https://career-marg.streamlit.app/)
+
 **Career मार्ग** is an executive multimodal AI career preparation platform built to empower students and job seekers through high-fidelity resume document understanding, ATS compatibility optimization, skill gap analysis, personalized interview preparation, text-based interactive mock interviews, career role matching, targeted portfolio project recommendations, industry readiness scoring, and grounded professional branding generation.
 
 ---
