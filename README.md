@@ -76,6 +76,9 @@
 ### 11. Multi-Graph Executive Analytics Dashboard
 ![Executive SaaS Dashboard](assets/screenshots/10_saas_dashboard.png)
 
+### 12. Technical Architecture & System Specifications
+![Technical Architecture](assets/screenshots/11_technical_architecture.png)
+
 ---
 
 ## 🛠️ Architecture & Technology Stack
