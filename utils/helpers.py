@@ -927,36 +927,37 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
         left: 0;
         right: 0;
         width: 100% !important;
-        height: 70px !important;
+        min-height: 60px !important;
         z-index: 999999 !important;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 3rem;
+        padding: 0.4rem 2rem;
         background-color: #FFFFFF;
         border-bottom: 1px solid #E2E8F0;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
         box-sizing: border-box !important;
     }}
     .navbar-logo {{
         display: flex;
         align-items: center;
         gap: 0.6rem;
+        flex-shrink: 0;
     }}
     .logo-emoji {{
         font-size: 1.45rem;
     }}
     .logo-text {{
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         font-weight: 800;
         color: #1E293B;
         letter-spacing: -0.3px;
     }}
     .logo-tag {{
-        font-size: 0.8rem;
+        font-size: 0.75rem;
         background: linear-gradient(135deg, #FF5C00 0%, #D43F00 100%);
         color: white;
-        padding: 0.1rem 0.5rem;
+        padding: 0.1rem 0.45rem;
         border-radius: 4px;
         font-weight: 700;
         text-transform: uppercase;
@@ -964,17 +965,18 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
     .navbar-links {{
         display: flex;
         align-items: center;
-        gap: 0.8rem;
+        gap: 0.6rem;
         flex-wrap: wrap;
     }}
     .nav-link {{
         text-decoration: none !important;
         color: #64748B !important;
         font-weight: 600;
-        font-size: 0.9rem;
-        padding: 0.45rem 0.8rem;
+        font-size: 0.86rem;
+        padding: 0.4rem 0.75rem;
         border-radius: 6px;
         transition: all 0.2s ease;
+        white-space: nowrap;
     }}
     .nav-link:hover {{
         color: #FF5C00 !important;
@@ -985,6 +987,140 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
         color: #FFFFFF !important;
         font-weight: 700;
         box-shadow: 0 3px 8px rgba(255, 92, 0, 0.15);
+    }}
+
+    /* ========================================================= */
+    /* RESPONSIVE MEDIA QUERIES (Mobile, Tablet, Small Laptops)  */
+    /* ========================================================= */
+
+    /* Large Tablets & Laptops (<= 1200px) */
+    @media (max-width: 1200px) {{
+        .custom-navbar {{
+            padding: 0.4rem 1.2rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.4rem !important;
+        }}
+        .navbar-links {{
+            width: 100% !important;
+            overflow-x: auto !important;
+            white-space: nowrap !important;
+            padding-bottom: 0.25rem !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }}
+        .navbar-links::-webkit-scrollbar {{
+            display: none; /* Chrome/Safari */
+        }}
+        .nav-link {{
+            font-size: 0.8rem !important;
+            padding: 0.35rem 0.6rem !important;
+            flex-shrink: 0 !important;
+        }}
+        .block-container {{
+            padding-top: 7.2rem !important;
+            padding-left: 1.2rem !important;
+            padding-right: 1.2rem !important;
+        }}
+    }}
+
+    /* Mobile Devices & Small Tablets (<= 768px) */
+    @media (max-width: 768px) {{
+        .block-container {{
+            max-width: 100% !important;
+            padding-left: 0.85rem !important;
+            padding-right: 0.85rem !important;
+            padding-top: 7.8rem !important;
+            padding-bottom: 1.5rem !important;
+        }}
+
+        .hero-main-title {{
+            font-size: 2.3rem !important;
+            letter-spacing: -0.8px !important;
+            margin-bottom: 0.8rem !important;
+            line-height: 1.15 !important;
+        }}
+
+        .hero-tagline {{
+            font-size: 1.1rem !important;
+        }}
+
+        .hero-desc-para {{
+            font-size: 0.96rem !important;
+            margin-bottom: 1.4rem !important;
+        }}
+
+        .hero-learn-more-btn, .get-started-btn {{
+            padding: 0.65rem 1.5rem !important;
+            font-size: 0.9rem !important;
+            width: 100% !important;
+            text-align: center !important;
+            box-sizing: border-box !important;
+        }}
+
+        .custom-navbar {{
+            padding: 0.4rem 0.85rem !important;
+        }}
+
+        .logo-text {{
+            font-size: 1.05rem !important;
+        }}
+
+        .logo-tag {{
+            font-size: 0.68rem !important;
+        }}
+
+        /* Streamlit Grid Columns Auto-Stack on Mobile */
+        div[data-testid="column"] {{
+            width: 100% !important;
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }}
+
+        /* Metric Cards Responsiveness */
+        .metric-card {{
+            padding: 1rem 1.1rem !important;
+            margin-bottom: 0.8rem !important;
+        }}
+
+        .metric-value {{
+            font-size: 1.65rem !important;
+        }}
+
+        /* Plotly & SVG Responsiveness */
+        .js-plotly-plot, .plotly, div[data-testid="stPlotlyChart"] {{
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: auto !important;
+        }}
+
+        /* Data Tables & Code Chips Horizontal Scrolling */
+        table, div[data-testid="stTable"] {{
+            display: block !important;
+            overflow-x: auto !important;
+            white-space: nowrap !important;
+        }}
+
+        div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] {{
+            padding: 1.2rem 0.8rem !important;
+        }}
+    }}
+
+    /* Extra Small Phones (<= 480px) */
+    @media (max-width: 480px) {{
+        .hero-main-title {{
+            font-size: 1.95rem !important;
+        }}
+
+        .block-container {{
+            padding-top: 8.2rem !important;
+            padding-left: 0.6rem !important;
+            padding-right: 0.6rem !important;
+        }}
+
+        .nav-link {{
+            font-size: 0.76rem !important;
+            padding: 0.3rem 0.5rem !important;
+        }}
     }}
     {extra_css}
 </style>
