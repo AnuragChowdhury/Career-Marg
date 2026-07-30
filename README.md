@@ -65,7 +65,7 @@
 ![Mock Interview Report](assets/screenshots/06_mock_report.png)
 
 ### 8. Career Role Match Recommendations & Benchmark Scoring
-![Career Role Match](assets/screenshots/07_career_recommendations.jpg)
+![Career Role Match](assets/screenshots/07_career_recommendations.png)
 
 ### 9. Targeted Portfolio Project Recommendation Engine
 ![Portfolio Project Recommendations](assets/screenshots/08_project_recommendations.png)
