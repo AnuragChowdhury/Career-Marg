@@ -889,7 +889,73 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
         color: #FFFFFF !important;
         box-shadow: 0 4px 12px rgba(255, 92, 0, 0.2) !important;
     }}
-    div[data-testid="stFileUploader"] svg {{
+    div[data-testid="stFileUploader"] section[data-testid="stFileUploaderDropzone"] svg {{
+        fill: #FF5C00 !important;
+        color: #FF5C00 !important;
+    }}
+
+    /* Streamlit File Uploader Uploaded File Item / Pill Light Theme Override */
+    div[data-testid="stFileUploaderFileData"],
+    div[data-testid="stFileUploaderFile"],
+    div[data-testid="stUploadedFileData"],
+    ul[data-testid="stFileUploaderUserUploadedFiles"] li,
+    div[data-testid="stFileUploader"] ul li,
+    div[data-testid="stFileUploader"] div[role="listitem"],
+    [data-testid="stFileUploaderFile"],
+    [data-testid="stFileUploaderFileData"],
+    [data-testid="stFileUploaderUserUploadedFiles"] li {{
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        color: #0F172A !important;
+        border: 1px solid #CBD5E1 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05) !important;
+    }}
+
+    div[data-testid="stFileUploaderFileData"] *,
+    div[data-testid="stFileUploaderFile"] *,
+    div[data-testid="stUploadedFileData"] *,
+    ul[data-testid="stFileUploaderUserUploadedFiles"] *,
+    [data-testid="stFileUploaderFileName"],
+    [data-testid="stFileUploaderFile"] span,
+    [data-testid="stFileUploaderFile"] div,
+    [data-testid="stFileUploaderFile"] small {{
+        color: #0F172A !important;
+        fill: #0F172A !important;
+    }}
+
+    div[data-testid="stFileUploaderFileData"] small,
+    div[data-testid="stFileUploaderFile"] small,
+    div[data-testid="stUploadedFileData"] small {{
+        color: #475569 !important;
+    }}
+
+    /* Delete / Remove button inside file pill */
+    button[data-testid="stFileUploaderDeleteBtn"],
+    div[data-testid="stFileUploaderFileData"] button,
+    div[data-testid="stFileUploaderFile"] button,
+    div[data-testid="stUploadedFileData"] button {{
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        border: 1px solid #CBD5E1 !important;
+        border-radius: 6px !important;
+        color: #FF5C00 !important;
+        padding: 0.2rem 0.4rem !important;
+    }}
+
+    button[data-testid="stFileUploaderDeleteBtn"]:hover,
+    div[data-testid="stFileUploaderFileData"] button:hover,
+    div[data-testid="stFileUploaderFile"] button:hover,
+    div[data-testid="stUploadedFileData"] button:hover {{
+        background-color: #FFF8F5 !important;
+        border-color: #FF5C00 !important;
+        color: #FF5C00 !important;
+    }}
+
+    button[data-testid="stFileUploaderDeleteBtn"] svg,
+    div[data-testid="stFileUploaderFileData"] button svg,
+    div[data-testid="stFileUploaderFile"] button svg,
+    div[data-testid="stUploadedFileData"] button svg {{
         fill: #FF5C00 !important;
         color: #FF5C00 !important;
     }}
