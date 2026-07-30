@@ -9,7 +9,7 @@
 ## 🌟 Key Features & Capability Matrix
 
 1. **Multimodal Resume Upload & Document Layout Understanding**:
-   - Supports **Digital PDFs**, **Scanned PDFs**, and **Image Resumes (JPG, JPEG, PNG)**.
+   - Supports **Digital PDFs**, **Scanned PDFs**, **DOCX documents**, **TXT plain text files**, **Image Resumes (JPG, JPEG, PNG)**, and **Direct Text Paste** in the UI.
    - Powered by **Mistral OCR 3** for high-fidelity text, markdown, table, column, and visual layout extraction with local fallback capabilities.
    - Structuring into Pydantic JSON schemas, clearly separating candidate facts explicitly found in the resume from AI recommendations.
 

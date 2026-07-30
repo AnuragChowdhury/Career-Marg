@@ -7,7 +7,7 @@ import os
 import re
 from typing import Tuple, List, Dict, Any
 
-ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png"}
+ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".docx", ".txt"}
 MAX_FILE_SIZE_MB = 15.0
 
 
@@ -17,7 +17,7 @@ def validate_uploaded_file(filename: str, file_size_bytes: int) -> Tuple[bool, s
     """
     ext = os.path.splitext(filename)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
-        return False, f"Unsupported file format '{ext}'. Supported formats: PDF, JPG, JPEG, PNG."
+        return False, f"Unsupported file format '{ext}'. Supported formats: PDF, DOCX, TXT, JPG, JPEG, PNG."
     
     size_mb = file_size_bytes / (1024 * 1024)
     if size_mb > MAX_FILE_SIZE_MB:

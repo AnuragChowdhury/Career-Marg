@@ -14,6 +14,7 @@ from models.schemas import (
 )
 from utils.helpers import validate_uploaded_file, clean_text, extract_skills_from_text
 from utils.scoring import calculate_ats_score, compute_weighted_ats_overall, calculate_industry_readiness
+from services.mistral_ocr_service import MistralOCRService
 from services.document_service import DocumentService
 from services.resume_parser import ResumeParser
 from services.ats_service import ATSService
@@ -34,9 +35,40 @@ class TestCareerMargServices(unittest.TestCase):
         valid_img, _ = validate_uploaded_file("resume.png", 500 * 1024)
         self.assertTrue(valid_img)
 
-        invalid_ext, err = validate_uploaded_file("resume.docx", 1024)
+        valid_docx, _ = validate_uploaded_file("resume.docx", 1024 * 1024)
+        self.assertTrue(valid_docx)
+
+        valid_txt, _ = validate_uploaded_file("resume.txt", 1024)
+        self.assertTrue(valid_txt)
+
+        invalid_ext, err = validate_uploaded_file("resume.exe", 1024)
         self.assertFalse(invalid_ext)
         self.assertIn("Unsupported file format", err)
+
+    def test_docx_and_txt_extraction(self):
+        ocr_service = MistralOCRService()
+        
+        # Test TXT extraction
+        txt_bytes = b"John Doe\nSoftware Engineer\nSkills: Python, Streamlit, SQL"
+        txt_res = ocr_service.process_document(txt_bytes, "sample_resume.txt")
+        self.assertTrue(txt_res.get("success"))
+        self.assertIn("John Doe", txt_res.get("text"))
+        self.assertEqual(txt_res.get("engine"), "Plain Text Parser")
+
+        # Test DOCX extraction using python-docx Document
+        import docx
+        import io
+        doc = docx.Document()
+        doc.add_paragraph("Jane Smith - Data Scientist")
+        doc.add_paragraph("Skills: Python, Machine Learning, PyTorch")
+        bio = io.BytesIO()
+        doc.save(bio)
+        docx_bytes = bio.getvalue()
+
+        docx_res = ocr_service.process_document(docx_bytes, "sample_resume.docx")
+        self.assertTrue(docx_res.get("success"))
+        self.assertIn("Jane Smith", docx_res.get("text"))
+        self.assertEqual(docx_res.get("engine"), "DOCX Document Parser")
 
     def test_text_cleaning_and_skill_extraction(self):
         raw_sample = "Developed   a  machine learning system\n\nusing Python, PyTorch, and Docker."

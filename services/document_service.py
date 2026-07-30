@@ -18,10 +18,16 @@ class DocumentService:
         - Digital PDF
         - Scanned PDF
         - Image Resume (JPG / JPEG / PNG)
+        - Word Document (.docx)
+        - Plain Text Document (.txt)
         """
         ext = os.path.splitext(file_name)[1].lower()
         if ext in [".jpg", ".jpeg", ".png"]:
             return "Image-based Resume"
+        elif ext == ".docx":
+            return "Word Document (.docx)"
+        elif ext == ".txt":
+            return "Plain Text Document (.txt)"
         
         if ext == ".pdf":
             # Check text length relative to page count
@@ -39,7 +45,7 @@ class DocumentService:
         ext = os.path.splitext(file_name)[1].lower()
         file_type = self.detect_file_type(file_bytes, file_name, extracted_text)
         
-        page_count = 1
+        page_count = max(1, len(extracted_text) // 3000 + 1)
         has_columns = False
         has_tables = False
         formatting_warnings = []

@@ -25,8 +25,14 @@ class MistralOCRService:
     def process_document(self, file_bytes: bytes, file_name: str) -> Dict[str, Any]:
         """
         Main document OCR pipeline. Attempts Mistral OCR 3 first, falls back to PyMuPDF/PIL if unconfigured or API fails.
+        Handles .docx and .txt documents directly.
         """
         ext = os.path.splitext(file_name)[1].lower()
+
+        if ext == ".docx":
+            return self._extract_docx_text(file_bytes, file_name)
+        elif ext == ".txt":
+            return self._extract_txt_text(file_bytes, file_name)
 
         if self.is_configured():
             try:
@@ -142,3 +148,51 @@ class MistralOCRService:
                     "error": f"Failed to process image: {str(e)}",
                     "text": ""
                 }
+
+    def _extract_docx_text(self, file_bytes: bytes, file_name: str) -> Dict[str, Any]:
+        """
+        Extracts plain text and tabular content from Microsoft Word (.docx) documents using python-docx.
+        """
+        try:
+            import io
+            import docx
+            doc = docx.Document(io.BytesIO(file_bytes))
+            full_text = []
+            for para in doc.paragraphs:
+                if para.text.strip():
+                    full_text.append(para.text.strip())
+            for table in doc.tables:
+                for row in table.rows:
+                    row_text = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                    if row_text:
+                        full_text.append(row_text)
+            extracted = "\n\n".join(full_text)
+            return {
+                "success": True,
+                "engine": "DOCX Document Parser",
+                "text": extracted,
+                "page_count": max(1, len(extracted) // 3000 + 1)
+            }
+        except Exception as e:
+            return {
+                "success": False,
+                "engine": "DOCX Document Parser",
+                "error": f"Failed to parse DOCX file: {str(e)}",
+                "text": ""
+            }
+
+    def _extract_txt_text(self, file_bytes: bytes, file_name: str) -> Dict[str, Any]:
+        """
+        Extracts raw text content from plain text (.txt) files.
+        """
+        try:
+            text = file_bytes.decode("utf-8")
+        except UnicodeDecodeError:
+            text = file_bytes.decode("latin-1", errors="ignore")
+        
+        return {
+            "success": True,
+            "engine": "Plain Text Parser",
+            "text": text,
+            "page_count": max(1, len(text) // 3000 + 1)
+        }

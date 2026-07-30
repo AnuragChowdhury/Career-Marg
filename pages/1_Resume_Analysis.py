@@ -19,7 +19,7 @@ apply_custom_style(active_page="resume")
 col_head1, col_head2 = st.columns([3, 1])
 with col_head1:
     st.title("📄 Resume Upload & Multimodal Understanding")
-    st.caption("Supports Digital PDFs, Scanned PDFs, and Image Resumes (JPG, JPEG, PNG) via Mistral OCR 3")
+    st.caption("Supports Digital PDFs, Scanned PDFs, DOCX, TXT files, and Image Resumes (JPG, JPEG, PNG) or Direct Text Paste")
 with col_head2:
     st.markdown("<br>", unsafe_allow_html=True)
     if st.button("🔄 Start New Session", type="secondary"):
@@ -29,16 +29,37 @@ with col_head2:
 
 st.divider()
 
-# Upload Section
-uploaded_file = st.file_uploader(
-    "Choose a resume file to analyze",
-    type=["pdf", "jpg", "jpeg", "png"],
-    help="Upload your resume in PDF format or image format."
-)
+# Input Section (File Upload + Direct Text Area)
+input_tab1, input_tab2 = st.tabs(["📁 Upload Resume File (PDF, DOCX, TXT, Image)", "📝 Paste Resume Text"])
 
-if uploaded_file is not None:
-    file_bytes = uploaded_file.getvalue()
-    filename = uploaded_file.name
+file_bytes = None
+filename = None
+raw_pasted_text = None
+
+with input_tab1:
+    uploaded_file = st.file_uploader(
+        "Choose a resume file to analyze",
+        type=["pdf", "docx", "txt", "jpg", "jpeg", "png"],
+        help="Upload your resume in PDF, DOCX, TXT, or image format."
+    )
+    if uploaded_file is not None:
+        file_bytes = uploaded_file.getvalue()
+        filename = uploaded_file.name
+
+with input_tab2:
+    st.markdown("#### **Paste Resume Text Directly**")
+    pasted_text = st.text_area(
+        "Paste your complete resume text here:",
+        height=250,
+        placeholder="Paste your raw resume text, work history, skills, and background here...",
+        key="resume_text_area"
+    )
+    if pasted_text.strip():
+        raw_pasted_text = pasted_text.strip()
+        filename = "pasted_resume.txt"
+        file_bytes = raw_pasted_text.encode("utf-8")
+
+if file_bytes is not None and filename is not None:
     file_size = len(file_bytes)
 
     # 1. File Validation
@@ -46,11 +67,14 @@ if uploaded_file is not None:
     if not is_valid:
         st.error(f"❌ Validation Error: {err_msg}")
     else:
-        st.success(f"✓ File '{filename}' uploaded successfully ({file_size / 1024:.1f} KB)")
+        if raw_pasted_text:
+            st.success(f"✓ Direct text input detected ({len(raw_pasted_text)} characters)")
+        else:
+            st.success(f"✓ File '{filename}' uploaded successfully ({file_size / 1024:.1f} KB)")
         
         if st.button("🚀 Process & Analyze Resume", type="primary"):
-            with st.spinner("Processing document with Mistral OCR 3 & Layout Engine..."):
-                # 2. OCR Processing
+            with st.spinner("Processing document layout & executive understanding..."):
+                # 2. Document Extraction & OCR Processing
                 ocr_service = MistralOCRService()
                 ocr_res = ocr_service.process_document(file_bytes, filename)
                 
@@ -82,7 +106,7 @@ if uploaded_file is not None:
                 except Exception:
                     pass
 
-                st.toast("🔍 OCR layout analysis complete!", icon="👀")
+                st.toast("🔍 Layout analysis complete!", icon="👀")
                 st.toast("🧬 Executive profile parsed successfully!", icon="👤")
                 st.toast("✅ Candidate database synchronized!", icon="💾")
                 st.success("🎉 Resume analysis complete!")
