@@ -61,6 +61,21 @@
 ### 6. Interactive Text-Based Mock Interview Engine
 ![Mock Interview Simulator](assets/screenshots/05_mock_interview.png)
 
+### 7. Executive Mock Interview Evaluation & Turn-by-Turn Feedback
+![Mock Interview Report](assets/screenshots/06_mock_report.png)
+
+### 8. Career Role Match Recommendations & Benchmark Scoring
+![Career Role Match](assets/screenshots/07_career_recommendations.jpg)
+
+### 9. Targeted Portfolio Project Recommendation Engine
+![Portfolio Project Recommendations](assets/screenshots/08_project_recommendations.png)
+
+### 10. Grounded Professional Profile & Branding Generator
+![Professional Profile Generator](assets/screenshots/09_profile_generator.png)
+
+### 11. Multi-Graph Executive Analytics Dashboard
+![Executive SaaS Dashboard](assets/screenshots/10_saas_dashboard.png)
+
 ---
 
 ## 🛠️ Architecture & Technology Stack
