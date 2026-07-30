@@ -32,8 +32,7 @@ wheels/
 *.sqlite3
 data/*.db
 
-# Streamlit
-.streamlit/
+# Streamlit config is tracked in git for Streamlit Cloud deployment
 
 # Testing
 .pytest_cache/
