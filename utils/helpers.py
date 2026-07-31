@@ -1238,6 +1238,10 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
             font-size: 0.76rem !important;
             padding: 0.3rem 0.5rem !important;
         }}
+        .medium-story-btn, .medium-story-btn:visited, .medium-story-btn:hover, .medium-story-btn:active {
+            color: #FFFFFF !important;
+            text-decoration: none !important;
+        }
     }}
     {extra_css}
 </style>
