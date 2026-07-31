@@ -1,4 +1,4 @@
-# Building Career मार्ग: How I Built an Executive Multimodal AI Career Preparation & Intelligence Suite
+# Beyond the Black Box: How I Built Career मार्ग — An Executive Multimodal AI Suite for ATS Optimization, Skill Gaps, and Technical Interviews
 
 **By Anurag Chowdhury**  
 *Published on [Medium](https://medium.com/@anuragchowdhury19official)*  
