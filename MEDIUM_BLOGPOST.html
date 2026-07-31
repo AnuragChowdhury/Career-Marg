@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Medium Story Preview</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.7; color: #292929; background: #fff; }
+h1 { font-size: 2.2rem; margin-top: 2rem; color: #111; font-weight: 800; }
+h2 { font-size: 1.6rem; margin-top: 1.8rem; font-weight: 700; color: #111; }
+h3 { font-size: 1.3rem; margin-top: 1.5rem; font-weight: 700; }
+blockquote { border-left: 3px solid #111; padding-left: 1rem; margin: 1.5rem 0; color: #555; font-style: italic; }
+img { max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0; }
+a { color: #1a8917; text-decoration: underline; }
+code { background: #f2f2f2; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+</style>
+</head>
+<body>
+<h1>Apne Career Ko Do Raasta: Engineering Career मार्ग — A Grounded Multimodal AI Engine for Job Readiness & Real-Time Mock Interviews</h1>
+<br/>
+<p><strong>By Anurag Chowdhury</strong></p>
+<p><em>Published on <a href="https://medium.com/@anuragchowdhury19official">Medium</a></em></p>
+<br/>
+<hr/>
+<br/>
+<blockquote><strong>Tagline:</strong> <em>Apne Career ko do Raasta</em> (Give Your Career a Clear Path)</blockquote>
+<blockquote>🚀 <strong>Live Web Application:</strong> <a href="https://career-marg.streamlit.app/">career-marg.streamlit.app</a></blockquote>
+<blockquote>💻 <strong>GitHub Repository:</strong> <a href="https://github.com/AnuragChowdhury/Career-Marg">github.com/AnuragChowdhury/Career-Marg</a></blockquote>
+<blockquote>👤 <strong>Author Medium Profile:</strong> <a href="https://medium.com/@anuragchowdhury19official">@anuragchowdhury19official</a></blockquote>
+<br/>
+<hr/>
+<br/>
+<h2>📖 The Spark Behind Career मार्ग</h2>
+<br/>
+<p>Every job seeker has faced the frustration of the <strong>"Black Box" Hiring Barrier</strong>.</p>
+<br/>
+<p>You spend days tailoring your resume, applying for roles you are qualified for, only to receive instant automated rejection emails from Applicant Tracking Systems (ATS). When you ask traditional AI tools for help, you get generic resume advice or hallucinated experience summaries that sound impressive but fall apart during technical interviews.</p>
+<br/>
+<p>Traditional job preparation tools suffer from three fundamental flaws:</p>
+<ol><li><strong>Opaque Black-Box Scoring</strong>: Opaque ATS scanners give arbitrary match scores without explaining <em>why</em> or <em>how</em> the score was calculated.</li></ol>
+<ol><li><strong>Generic AI Wrapper Responses</strong>: Generic chatbots produce cookie-cutter interview questions and fake resume accomplishments.</li></ol>
+<ol><li><strong>Fragmented Workflows</strong>: Candidates must jump between separate tools for ATS checking, skill mapping, mock interviewing, and portfolio planning.</li></ol>
+<br/>
+<p>I set out to solve this problem by building <strong>Career मार्ग</strong> — an executive, end-to-end multimodal AI career intelligence suite designed to bridge the gap between candidate preparation and industry expectations.</p>
+<br/>
+<hr/>
+<br/>
+<h2>🌟 What is Career मार्ग?</h2>
+<br/>
+<p><strong>Career मार्ग</strong> is an executive-grade multimodal AI career preparation platform. Powered by <strong>Mistral OCR 3</strong>, fine-tuned LLM reasoning engines, and custom analytics, it provides candidates with a transparent, data-driven roadmap to job readiness.</p>
+<br/>
+<p>Whether you upload a digital PDF, a scanned document, a Microsoft Word (<code>.docx</code>) file, a <code>.txt</code> file, an image resume, or paste raw text directly, Career मार्ग transforms unstructured resume data into actionable career intelligence.</p>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/00_home.png" alt="Executive Landing Page"/></p>
+<p><em>Figure 1: Executive Landing Page & Platform Blueprint of Career मार्ग</em></p>
+<br/>
+<hr/>
+<br/>
+<h2>🚀 Deep Dive: The 10 Core Capabilities of Career मार्ग</h2>
+<br/>
+<p>Let's walk through the full suite of engineering features that power Career मार्ग.</p>
+<br/>
+<hr/>
+<br/>
+<h3>1. Multimodal Document Understanding & Mistral OCR 3</h3>
+<br/>
+<p>The first challenge in resume analysis is document layout extraction. Resumes come in various formats: multi-column PDFs, scanned images, table-heavy Word documents, and unformatted plain text.</p>
+<br/>
+<p>Career मार्ग integrates <strong>Mistral OCR 3</strong> with PyMuPDF/PIL local fallback engines to extract structured Markdown, columns, and visual layout hierarchy. A custom Pydantic v2 schema parser extracts verified facts (Education, Work Experience, Technical Skills, Projects) while strictly separating candidate facts from AI suggestions.</p>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/01_resume_analysis.png" alt="Resume Analysis"/></p>
+<p><em>Figure 2: Multimodal Resume Upload & Document Layout Understanding</em></p>
+<br/>
+<hr/>
+<br/>
+<h3>2. Transparent 5-Factor ATS Compatibility Optimization</h3>
+<br/>
+<p>Instead of giving candidates a random black-box percentage score, Career मार्ग implements a <strong>Transparent 5-Factor Scoring Algorithm</strong>:</p>
+<br/>
+<ul><li><strong>Required Technical Skills Overlap</strong> (40% Weight)</li></ul>
+<ul><li><strong>Keyword Match Density</strong> (25% Weight)</li></ul>
+<ul><li><strong>Work Experience Relevance</strong> (15% Weight)</li></ul>
+<ul><li><strong>Education Alignment</strong> (10% Weight)</li></ul>
+<ul><li><strong>Document Layout & Structure Quality</strong> (10% Weight)</li></ul>
+<br/>
+<p>The engine details exact matching keywords, missing high-priority skills, formatting warnings (e.g., table cells or multi-column layout risks for legacy ATS), and provides action-verb bullet point rewrites with quantifiable placeholders.</p>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/02_ats_analysis.png" alt="ATS Compatibility Auditor"/></p>
+<p><em>Figure 3: ATS Compatibility Auditor with Transparent Sub-Factor Breakdown</em></p>
+<br/>
+<hr/>
+<br/>
+<h3>3. Competency Gap Analysis & 30-Day Learning Roadmap</h3>
+<br/>
+<p>Knowing what skills you lack is only half the battle — knowing how to acquire them is what gets you hired.</p>
+<br/>
+<p>Career मार्ग categorizes candidate skills against target job descriptions into:</p>
+<ul><li>✅ <strong>Strong Match</strong>: Fully covered skills.</li></ul>
+<ul><li>⚡ <strong>Partial Match</strong>: Related or foundational skills needing upgrade.</li></ul>
+<ul><li>❌ <strong>Missing Skills</strong>: Critical role requirements absent from candidate profile.</li></ul>
+<ul><li>➕ <strong>Additional Skills</strong>: Unique candidate strengths.</li></ul>
+<br/>
+<p>From this breakdown, the system generates a <strong>Structured Executive 30-Day Action Plan</strong> divided into 10-day sprints (Days 1–10: High-Priority Skill Foundation, Days 11–20: Specialized Topics, Days 21–30: Portfolio Integration & Job Readiness).</p>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/03_skill_gap.png" alt="Skill Gap Analysis"/></p>
+<p><em>Figure 4: Skill Gap Categorization & Executive 30-Day Skill Gap Action Plan</em></p>
+<br/>
+<hr/>
+<br/>
+<h3>4. Personalized Interview Question Generator</h3>
+<br/>
+<p>Generic interview prep questions like <em>"Tell me about yourself"</em> don't prepare candidates for modern technical evaluations.</p>
+<br/>
+<p>Career मार्ग synthesizes non-generic, highly tailored questions across <strong>6 Core Categories</strong>:</p>
+<ol><li><strong>Technical Questions</strong>: Tailored to candidate's exact tech stack.</li></ol>
+<ol><li><strong>Project-Based Questions</strong>: Deep-dives into specific candidate projects.</li></ol>
+<ol><li><strong>Resume-Based Questions</strong>: Inquiries on specific work experience accomplishments.</li></ol>
+<ol><li><strong>Behavioral Questions</strong>: Scenario-based evaluation grounded in the target role.</li></ol>
+<ol><li><strong>HR & Cultural Fit Questions</strong>: Role expectations and alignment.</li></ol>
+<ol><li><strong>Skill-Gap Questions</strong>: Testing candidate awareness of missing competency areas.</li></ol>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/04_interview_prep.png" alt="Interview Preparation"/></p>
+<p><em>Figure 5: Personalized Interview Question Generator across 6 Categories</em></p>
+<br/>
+<hr/>
+<br/>
+<h3>5. Text-Based Interactive Mock Interview Simulator</h3>
+<br/>
+<p>The centerpiece of Career मार्ग's interview preparation is an interactive, one-question-at-a-time simulator. Candidates submit text answers to generated questions and receive real-time evaluation.</p>
+<br/>
+<p>The scoring model evaluates responses across 4 weighted metrics:</p>
+<ul><li><strong>Relevance</strong> (25%)</li></ul>
+<ul><li><strong>Technical Depth</strong> (35%)</li></ul>
+<ul><li><strong>Completeness</strong> (20%)</li></ul>
+<ul><li><strong>Clarity & Communication</strong> (20%)</li></ul>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/05_mock_interview.png" alt="Mock Interview Simulator"/></p>
+<p><em>Figure 6: Interactive Text-Based Mock Interview Engine in Action</em></p>
+<br/>
+<hr/>
+<br/>
+<h3>6. Turn-by-Turn Feedback & Executive Interview Report</h3>
+<br/>
+<p>Upon completing mock interview sessions, candidates receive an <strong>Executive End-of-Session Interview Report</strong> featuring an overall readiness score (e.g., <em>Interview Ready — High Confidence</em>), key strengths, actionable recommendations, and turn-by-turn question breakdowns complete with dynamic follow-up questions.</p>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/06_mock_report.png" alt="Mock Interview Report"/></p>
+<p><em>Figure 7: Executive End-of-Session Interview Report & Turn-by-Turn Feedback</em></p>
+<br/>
+<hr/>
+<br/>
+<h3>7. Career Role Matching & Industry Readiness Score</h3>
+<br/>
+<p>Not sure which job title fits your background best?</p>
+<br/>
+<p>Career मार्ग evaluates candidate credentials against industry benchmark roles (e.g., <em>Machine Learning Engineer</em>, <em>Data Scientist</em>, <em>Full Stack AI Developer</em>) and computes an overall <strong>Industry Readiness Score (0-100)</strong> across 6 core weighted dimensions: Technical Skills, Project Quality, Work Experience, Resume Quality, Target Role Alignment, and Interview Readiness.</p>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/07_career_recommendations.png" alt="Career Role Match"/></p>
+<p><em>Figure 8: Career Role Match Recommendations & Industry Readiness Score Breakdown</em></p>
+<br/>
+<hr/>
+<br/>
+<h3>8. Targeted Portfolio Project Recommendation Engine</h3>
+<br/>
+<p>To close identified skill gaps, candidates need proof of capability. Career मार्ग suggests targeted, portfolio-ready project architectures designed specifically to cover missing skills.</p>
+<br/>
+<p>Each recommendation includes:</p>
+<ul><li><strong>Project Problem Statement</strong></li></ul>
+<ul><li><strong>Skills Covered from Identified Gap</strong></li></ul>
+<ul><li><strong>Employability Justification</strong></li></ul>
+<ul><li><strong>Complete Recommended Technology Stack</strong></li></ul>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/08_project_recommendations.png" alt="Portfolio Project Recommendations"/></p>
+<p><em>Figure 9: Portfolio Project Recommendation Engine for Targeted Skill Gaps</em></p>
+<br/>
+<hr/>
+<br/>
+<h3>9. Grounded Professional Profile & Branding Generator</h3>
+<br/>
+<p>Recruiters evaluate candidates across multiple touchpoints. Career मार्ग generates grounded professional content tailored for:</p>
+<ul><li>Resume Professional Summaries</li></ul>
+<ul><li>LinkedIn Headlines</li></ul>
+<ul><li>LinkedIn About Sections</li></ul>
+<ul><li>Portfolio Bios</li></ul>
+<ul><li>GitHub Profile READMEs</li></ul>
+<br/>
+<p><strong>Strict Grounding Guarantee</strong>: All generated content is strictly derived from verified facts in the candidate profile — ensuring zero hallucinated experience or unearned credentials.</p>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/09_profile_generator.png" alt="Professional Profile Generator"/></p>
+<p><em>Figure 10: Grounded Professional Profile & Branding Generator</em></p>
+<br/>
+<hr/>
+<br/>
+<h3>10. Multi-Graph Executive SaaS Analytics Dashboard</h3>
+<br/>
+<p>To track progress over time, Career मार्ग features a multi-graph executive analytics dashboard equipped with:</p>
+<ul><li><strong>Candidate Competency Radar Chart</strong> (Experience, Technical Skills, Soft Skills, Domain Fit, Education, ATS Optimization)</li></ul>
+<ul><li><strong>Skill Match Ratio Breakdown Donut Chart</strong></li></ul>
+<ul><li>Overall ATS Score, Industry Readiness, and Verified Skills Metrics Grid</li></ul>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/10_saas_dashboard.png" alt="Executive SaaS Dashboard"/></p>
+<p><em>Figure 11: Multi-Graph Executive Analytics SaaS Dashboard</em></p>
+<br/>
+<hr/>
+<br/>
+<h2>🛠️ Under the Hood: System Architecture & Tech Stack</h2>
+<br/>
+<p>Building Career मार्ग required a modular, decoupled software architecture designed for performance, reliability, and local state persistence.</p>
+<br/>
+<p><img src="https://raw.githubusercontent.com/AnuragChowdhury/Career-Marg/main/assets/screenshots/11_technical_architecture.png" alt="Technical Architecture"/></p>
+<p><em>Figure 12: Technical Architecture & Core System Mechanics of Career मार्ग</em></p>
+<br/>
+<h3>Core Technology Stack:</h3>
+<ul><li><strong>UI Framework</strong>: Streamlit with custom executive CSS design system, Plotly charts, and client-side single page navigation.</li></ul>
+<ul><li><strong>Service Business Logic Layer</strong>: Decoupled Python services (<code>mistral_ocr_service</code>, <code>document_service</code>, <code>resume_parser</code>, <code>llm_service</code>, <code>ats_service</code>, <code>skill_gap_service</code>, <code>interview_service</code>, <code>career_service</code>, <code>recommendation_service</code>, <code>profile_service</code>).</li></ul>
+<ul><li><strong>Document OCR</strong>: Mistral OCR 3 REST API with PyMuPDF (<code>fitz</code>), PIL, and <code>python-docx</code> fallback parsing engines.</li></ul>
+<ul><li><strong>Data Validation & Schemas</strong>: Pydantic v2 schemas (<code>CandidateProfile</code>, <code>DocumentAnalysis</code>, <code>ATSResult</code>, <code>SkillGapResult</code>).</li></ul>
+<ul><li><strong>Persistence Layer</strong>: SQLite database via SQLAlchemy ORM (<code>careermarg.db</code>) with automatic database session recovery.</li></ul>
+<br/>
+<hr/>
+<br/>
+<h2>💡 Key Lessons Learned & Engineering Takeaways</h2>
+<br/>
+<ol><li><strong>Multimodal Fallbacks are Essential</strong>: Never rely solely on a single cloud API. Building PyMuPDF, PIL, and <code>python-docx</code> local fallbacks ensured Career मार्ग runs smoothly even when cloud OCR APIs timeout or reach rate limits.</li></ol>
+<ol><li><strong>State Persistence Across Page Navigation</strong>: Single-page application state management in multi-page frameworks like Streamlit requires database fallback auto-loading to prevent state loss during browser refreshes or GET navigations.</li></ol>
+<ol><li><strong>Fact Grounding Matters</strong>: In career tools, hallucination is unacceptable. Enforcing strict Pydantic schemas and prompt grounding rules prevents AI models from inventing fake job titles or credentials.</li></ol>
+<br/>
+<hr/>
+<br/>
+<h2>🌍 Try Career मार्ग Today!</h2>
+<br/>
+<p>Career मार्ग is fully open-source and live for anyone to explore:</p>
+<br/>
+<ul><li>🚀 <strong>Experience the Live Web App:</strong> <a href="https://career-marg.streamlit.app/">career-marg.streamlit.app</a></li></ul>
+<ul><li>💻 <strong>Explore the Source Code on GitHub:</strong> <a href="https://github.com/AnuragChowdhury/Career-Marg">github.com/AnuragChowdhury/Career-Marg</a></li></ul>
+<ul><li>📬 <strong>Connect with me on Medium:</strong> <a href="https://medium.com/@anuragchowdhury19official">@anuragchowdhury19official</a></li></ul>
+<br/>
+<p>If you find this project helpful or inspiring for your own AI applications, feel free to star the GitHub repository or reach out!</p>
+<br/>
+<hr/>
+<p><em>Apne Career ko do Raasta — Give your career the direction it deserves.</em></p>
+<br/>
+</body>
+</html>

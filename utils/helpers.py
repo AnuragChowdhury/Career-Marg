@@ -1264,6 +1264,9 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
             is_active = (p["key"] == active_page)
             active_class = "class='nav-link active-link'" if is_active else "class='nav-link'"
             links_html += f'<a href="{p["url"]}" target="_self" {active_class}>{p["label"]}</a>\n'
+        
+        medium_url = "https://medium.com/@anuragchowdhury19official/building-career-%E0%A4%AE%E0%A4%BE%E0%A4%B0%E0%A5%8D%E0%A4%97-how-i-built-an-executive-multimodal-ai-career-preparation-intelligence-2e85b983ebbd"
+        links_html += f'<a href="{medium_url}" target="_blank" class="nav-link" style="color: #FF5C00 !important; font-weight: 700;">📖 Medium Story</a>\n'
             
         import base64
         import os
