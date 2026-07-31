@@ -1,4 +1,4 @@
-# Beyond the Black Box: How I Built Career मार्ग — An Executive Multimodal AI Suite for ATS Optimization, Skill Gaps, and Technical Interviews
+# Apne Career Ko Do Raasta: Engineering Career मार्ग — A Grounded Multimodal AI Engine for Job Readiness & Real-Time Mock Interviews
 
 **By Anurag Chowdhury**  
 *Published on [Medium](https://medium.com/@anuragchowdhury19official)*  
