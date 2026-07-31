@@ -1239,7 +1239,9 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
             padding: 0.3rem 0.5rem !important;
         }}
         .medium-story-btn, .medium-story-btn:visited, .medium-story-btn:hover, .medium-story-btn:active {{
-            color: #FFFFFF !important;
+            color: #FF5C00 !important;
+            background-color: #FFFFFF !important;
+            border: 2px solid #FF5C00 !important;
             text-decoration: none !important;
         }}
     }}
