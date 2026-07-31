@@ -1238,11 +1238,10 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
             font-size: 0.76rem !important;
             padding: 0.3rem 0.5rem !important;
         }}
-        .medium-story-btn, .medium-story-btn:visited, .medium-story-btn:hover, .medium-story-btn:active {{
-            color: #FF5C00 !important;
-            background-color: #FFFFFF !important;
-            border: 2px solid #FF5C00 !important;
+        .medium-btn, .medium-btn *, .medium-btn:link, .medium-btn:visited, .medium-btn:hover, .medium-btn:active {{
+            color: #FFFFFF !important;
             text-decoration: none !important;
+            fill: #FFFFFF !important;
         }}
     }}
     {extra_css}
