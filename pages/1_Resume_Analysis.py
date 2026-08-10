@@ -103,7 +103,11 @@ if file_bytes is not None and filename is not None:
                     )
                     st.session_state.candidate_id = c_id
                     try:
+                        # Set cid in URL query params — this persists across st.rerun()
                         st.query_params["cid"] = str(c_id)
+                    except Exception:
+                        pass
+                    try:
                         with open(ACTIVE_CANDIDATE_FILE, "w") as f:
                             f.write(str(c_id))
                     except Exception:
@@ -111,10 +115,22 @@ if file_bytes is not None and filename is not None:
                 except Exception:
                     pass
 
-                st.toast("🔍 Layout analysis complete!", icon="👀")
-                st.toast("🧬 Executive profile parsed successfully!", icon="👤")
-                st.toast("✅ Candidate database synchronized!", icon="💾")
-                st.success("🎉 Resume analysis complete!")
+                # Flag to show success toasts after rerun
+                st.session_state["_resume_just_processed"] = True
+
+            # Force rerun so navbar re-renders with ?cid= embedded in all nav links
+            # Without this, the navbar shows links WITHOUT ?cid= because it rendered
+            # before the candidate ID was set, causing "No resume loaded" on every other page.
+            st.rerun()
+
+# Show success toasts after rerun (set by the processing block above)
+if st.session_state.pop("_resume_just_processed", False):
+    st.toast("🔍 Layout analysis complete!", icon="👀")
+    st.toast("🧬 Executive profile parsed successfully!", icon="👤")
+    st.toast("✅ Candidate database synchronized!", icon="💾")
+    st.success("🎉 Resume analysis complete! You can now navigate to any page using the top navbar.")
+
+
 
 # Render Results if Candidate Profile is Loaded
 if st.session_state.candidate_profile:
