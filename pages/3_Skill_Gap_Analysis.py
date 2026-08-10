@@ -25,7 +25,7 @@ jd_text = st.session_state.job_description
 
 st.info(f"🎯 Analyzing skill gaps for Target Role: **{target_role}**")
 
-if st.button("🔄 Generate Skill Gap & Roadmap", type="primary") or not st.session_state.skill_gap_result:
+if st.button("🔄 Generate Skill Gap & Roadmap", type="primary"):
     with st.spinner("Comparing candidate competencies against target requirements..."):
         sg_service = SkillGapService()
         sg_res = sg_service.analyze_skill_gaps(
@@ -50,6 +50,9 @@ if st.button("🔄 Generate Skill Gap & Roadmap", type="primary") or not st.sess
             )
         except Exception:
             pass
+
+if not st.session_state.skill_gap_result:
+    st.info("👇 Click the **'Generate Skill Gap & Roadmap'** button above to compare your resume against target requirements and build your personalized learning plan.")
 
 # Display Categorization Grid
 if st.session_state.skill_gap_result:

@@ -161,6 +161,14 @@ class TestCareerMargServices(unittest.TestCase):
         )
         self.assertGreater(eval_res.overall_answer_score, 70.0)
 
+        # Test "I am not sure" low score evaluation
+        not_sure_eval = int_svc.evaluate_answer(
+            questions[0],
+            "I am not sure"
+        )
+        self.assertLess(not_sure_eval.overall_answer_score, 10.0)
+        self.assertIn("not sure", not_sure_eval.feedback.lower())
+
         report = int_svc.generate_session_report([eval_res])
         self.assertGreater(report["overall_score"], 0)
         self.assertIn("Interview Ready", report["readiness_level"])

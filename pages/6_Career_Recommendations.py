@@ -22,10 +22,31 @@ if not st.session_state.candidate_profile:
 
 career_svc = CareerService()
 
-# 1. Career Role Recommendation Engine
-st.subheader("🎯 Career Role Match Recommendations")
-recs = career_svc.recommend_career_roles(st.session_state.candidate_profile)
-st.session_state.career_recommendations = recs
+if st.button("📊 Calculate Career Match & Readiness Score", type="primary"):
+    with st.spinner("Analyzing candidate background against benchmark industry roles..."):
+        recs = career_svc.recommend_career_roles(st.session_state.candidate_profile)
+        st.session_state.career_recommendations = recs
+        
+        ats_score = st.session_state.ats_result.overall_score if st.session_state.ats_result else 75.0
+        mock_scores = [h.overall_answer_score for h in st.session_state.mock_interview_history]
+        avg_mock = sum(mock_scores) / len(mock_scores) if mock_scores else 70.0
+
+        readiness = career_svc.evaluate_industry_readiness(
+            candidate_profile=st.session_state.candidate_profile,
+            ats_score=ats_score,
+            skill_gap_percentage=25.0,
+            mock_interview_score=avg_mock
+        )
+        st.session_state.industry_readiness = readiness
+        st.success("✓ Career Role Match and Readiness Score calculated!")
+
+if not st.session_state.career_recommendations:
+    st.info("👇 Click the **'Calculate Career Match & Readiness Score'** button above to analyze your benchmark role fits and industry readiness.")
+
+if st.session_state.career_recommendations:
+    recs = st.session_state.career_recommendations
+    # 1. Career Role Recommendation Engine
+    st.subheader("🎯 Career Role Match Recommendations")
 
 col_cards = st.columns(len(recs[:3]))
 for idx, role in enumerate(recs[:3]):
@@ -58,20 +79,10 @@ with st.expander("🔍 View Full Career Role Alignment Breakdown"):
 
 st.divider()
 
-# 2. Industry Readiness Evaluation (Feature 9)
-st.subheader("🛡️ Industry Readiness Score")
-
-ats_score = st.session_state.ats_result.overall_score if st.session_state.ats_result else 75.0
-mock_scores = [h.overall_answer_score for h in st.session_state.mock_interview_history]
-avg_mock = sum(mock_scores) / len(mock_scores) if mock_scores else 70.0
-
-readiness = career_svc.evaluate_industry_readiness(
-    candidate_profile=st.session_state.candidate_profile,
-    ats_score=ats_score,
-    skill_gap_percentage=25.0,
-    mock_interview_score=avg_mock
-)
-st.session_state.industry_readiness = readiness
+if st.session_state.industry_readiness:
+    readiness = st.session_state.industry_readiness
+    st.divider()
+    st.subheader("🛡️ Industry Readiness Score")
 
 m_col1, m_col2 = st.columns([1, 1.3])
 

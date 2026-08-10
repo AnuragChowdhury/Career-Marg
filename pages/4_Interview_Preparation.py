@@ -24,7 +24,7 @@ missing = st.session_state.skill_gap_result.missing_skills if st.session_state.s
 
 st.info(f"🎯 Target Job Role: **{target_role}**")
 
-if st.button("✨ Generate Personalized Question Set", type="primary") or not st.session_state.interview_questions:
+if st.button("✨ Generate Personalized Question Set", type="primary"):
     with st.spinner("Analyzing resume content, projects, and target role to craft non-generic questions..."):
         int_service = InterviewService()
         questions = int_service.generate_personalized_questions(
@@ -34,6 +34,9 @@ if st.button("✨ Generate Personalized Question Set", type="primary") or not st
         )
         st.session_state.interview_questions = questions
         st.success(f"✓ Generated {len(questions)} personalized questions across 6 categories!")
+
+if not st.session_state.interview_questions:
+    st.info("👇 Click the **'Generate Personalized Question Set'** button above to craft custom interview questions tailored specifically to your resume facts.")
 
 # Display Generated Questions by Category
 if st.session_state.interview_questions:

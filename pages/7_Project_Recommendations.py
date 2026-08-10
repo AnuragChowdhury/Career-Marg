@@ -24,7 +24,7 @@ missing_skills = st.session_state.skill_gap_result.missing_skills if st.session_
 
 st.info(f"🎯 Tailoring project ideas for **{target_role}** addressing missing skills: **{', '.join(missing_skills[:4])}**")
 
-if st.button("✨ Generate Custom Project Recommendations", type="primary") or not st.session_state.project_recommendations:
+if st.button("✨ Generate Custom Project Recommendations", type="primary"):
     with st.spinner("Synthesizing project architectures based on skill gaps..."):
         rec_svc = RecommendationService()
         projects = rec_svc.generate_project_recommendations(
@@ -34,6 +34,9 @@ if st.button("✨ Generate Custom Project Recommendations", type="primary") or n
         )
         st.session_state.project_recommendations = projects
         st.success(f"✓ Recommended {len(projects)} tailored portfolio projects!")
+
+if not st.session_state.project_recommendations:
+    st.info("👇 Click the **'Generate Custom Project Recommendations'** button above to generate targeted portfolio projects addressing your skill gaps.")
 
 # Render Recommended Projects
 if st.session_state.project_recommendations:

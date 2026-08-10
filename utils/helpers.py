@@ -10,6 +10,11 @@ from typing import Tuple, List, Dict, Any
 ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".docx", ".txt"}
 MAX_FILE_SIZE_MB = 15.0
 
+# Absolute path to active_candidate_id.txt, derived from project root
+# This ensures it resolves correctly regardless of which Streamlit page triggers the import
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ACTIVE_CANDIDATE_FILE = os.path.join(_PROJECT_ROOT, "data", "active_candidate_id.txt")
+
 
 def validate_uploaded_file(filename: str, file_size_bytes: int) -> Tuple[bool, str]:
     """
@@ -85,8 +90,9 @@ def init_session_state(st_session_state: Any) -> None:
         if key not in st_session_state:
             st_session_state[key] = value
 
-    # Auto-load active candidate profile across multi-page navigation or page refreshes
-    if st_session_state["candidate_profile"] is None and not st_session_state.get("session_reset", False):
+    # Auto-load active candidate profile across multi-page tab navigation
+    import streamlit as st
+    if st_session_state["candidate_profile"] is None:
         try:
             from data.database import SessionLocal, CandidateRecord, JobAnalysisRecord, init_db
             from models.schemas import CandidateProfile, DocumentAnalysis, ATSResult, SkillGapResult
@@ -95,34 +101,36 @@ def init_session_state(st_session_state: Any) -> None:
             db_session = SessionLocal()
             try:
                 rec = None
-                active_file = os.path.join("data", "active_candidate_id.txt")
-                if os.path.exists(active_file):
-                    with open(active_file, "r") as f:
-                        c_id_str = f.read().strip()
-                    if c_id_str and c_id_str.isdigit():
-                        c_id = int(c_id_str)
-                        rec = db_session.query(CandidateRecord).filter(CandidateRecord.id == c_id).first()
-                
-                # Fallback: Query the most recently created candidate record from database
+                cid = st.query_params.get("cid")
+                if cid and str(cid).isdigit():
+                    rec = db_session.query(CandidateRecord).filter(CandidateRecord.id == int(cid)).first()
+
                 if rec is None:
-                    rec = db_session.query(CandidateRecord).order_by(CandidateRecord.id.desc()).first()
+                    if os.path.exists(ACTIVE_CANDIDATE_FILE):
+                        try:
+                            with open(ACTIVE_CANDIDATE_FILE, "r") as f:
+                                c_id_str = f.read().strip()
+                            if c_id_str and c_id_str.isdigit():
+                                rec = db_session.query(CandidateRecord).filter(CandidateRecord.id == int(c_id_str)).first()
+                        except Exception:
+                            pass
 
                 if rec and rec.profile_json:
                     st_session_state["candidate_id"] = rec.id
-                    st_session_state["candidate_profile"] = CandidateProfile.parse_raw(rec.profile_json)
-                    st_session_state["raw_ocr_text"] = rec.raw_text or ""
-                    if rec.doc_analysis_json:
-                        st_session_state["document_analysis"] = DocumentAnalysis.parse_raw(rec.doc_analysis_json)
-                    
-                    # Ensure active_candidate_id.txt is updated
                     try:
-                        os.makedirs("data", exist_ok=True)
-                        with open(active_file, "w") as f:
-                            f.write(str(rec.id))
+                        st_session_state["candidate_profile"] = CandidateProfile.model_validate_json(rec.profile_json)
+                    except Exception:
+                        st_session_state["candidate_profile"] = CandidateProfile.parse_raw(rec.profile_json)
+                    st_session_state["raw_ocr_text"] = rec.raw_text or ""
+                    try:
+                        if rec.doc_analysis_json:
+                            try:
+                                st_session_state["document_analysis"] = DocumentAnalysis.model_validate_json(rec.doc_analysis_json)
+                            except Exception:
+                                st_session_state["document_analysis"] = DocumentAnalysis.parse_raw(rec.doc_analysis_json)
                     except Exception:
                         pass
 
-                    # Query latest associated job analysis
                     job_rec = db_session.query(JobAnalysisRecord).filter(
                         JobAnalysisRecord.candidate_id == rec.id
                     ).order_by(JobAnalysisRecord.id.desc()).first()
@@ -132,14 +140,27 @@ def init_session_state(st_session_state: Any) -> None:
                             st_session_state["target_job_role"] = job_rec.target_role
                         if job_rec.job_description:
                             st_session_state["job_description"] = job_rec.job_description
-                        if job_rec.ats_result_json and job_rec.ats_result_json != "{}":
-                            st_session_state["ats_result"] = ATSResult.parse_raw(job_rec.ats_result_json)
-                        if job_rec.skill_gap_json and job_rec.skill_gap_json != "{}":
-                            st_session_state["skill_gap_result"] = SkillGapResult.parse_raw(job_rec.skill_gap_json)
+                        try:
+                            if job_rec.ats_result_json and job_rec.ats_result_json != "{}":
+                                try:
+                                    st_session_state["ats_result"] = ATSResult.model_validate_json(job_rec.ats_result_json)
+                                except Exception:
+                                    st_session_state["ats_result"] = ATSResult.parse_raw(job_rec.ats_result_json)
+                        except Exception:
+                            pass
+                        try:
+                            if job_rec.skill_gap_json and job_rec.skill_gap_json != "{}":
+                                try:
+                                    st_session_state["skill_gap_result"] = SkillGapResult.model_validate_json(job_rec.skill_gap_json)
+                                except Exception:
+                                    st_session_state["skill_gap_result"] = SkillGapResult.parse_raw(job_rec.skill_gap_json)
+                        except Exception:
+                            pass
             finally:
                 db_session.close()
-        except Exception:
-            pass
+        except Exception as _e:
+            import traceback as _tb
+            st.warning(f"Session restore error: {_e} | {_tb.format_exc()}")
 
 
 def reset_session_state(st_session_state: Any) -> None:
@@ -147,6 +168,17 @@ def reset_session_state(st_session_state: Any) -> None:
     Resets Streamlit session state to default empty values when a new session
     is explicitly started or when no document is uploaded.
     """
+    import streamlit as st
+    try:
+        st.query_params.clear()
+    except Exception:
+        pass
+
+    if os.path.exists(ACTIVE_CANDIDATE_FILE):
+        try:
+            os.remove(ACTIVE_CANDIDATE_FILE)
+        except Exception:
+            pass
     defaults = {
         "candidate_id": None,
         "candidate_profile": None,
@@ -1250,6 +1282,13 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
 
     # Render Navbar if active_page is provided
     if active_page:
+        cid = st.session_state.get("candidate_id") or st.query_params.get("cid")
+        if st.session_state.get("candidate_id") and not st.query_params.get("cid"):
+            try:
+                st.query_params["cid"] = str(st.session_state["candidate_id"])
+            except Exception:
+                pass
+
         pages = [
             {"label": "Home", "url": "/", "key": "home"},
             {"label": "Resume Parser", "url": "/Resume_Analysis", "key": "resume"},
@@ -1268,7 +1307,8 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
         for p in pages:
             is_active = (p["key"] == active_page)
             active_class = "class='nav-link active-link'" if is_active else "class='nav-link'"
-            links_html += f'<a href="{p["url"]}" target="_self" {active_class}>{p["label"]}</a>\n'
+            target_url = f"{p['url']}?cid={cid}" if cid and p["key"] != "home" else p["url"]
+            links_html += f'<a href="{target_url}" target="_self" {active_class}>{p["label"]}</a>\n'
             
         import base64
         import os

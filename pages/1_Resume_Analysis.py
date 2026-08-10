@@ -6,7 +6,7 @@ import streamlit as st
 import os
 import json
 
-from utils.helpers import validate_uploaded_file, init_session_state, reset_session_state, apply_custom_style
+from utils.helpers import validate_uploaded_file, init_session_state, reset_session_state, apply_custom_style, ACTIVE_CANDIDATE_FILE
 from services.mistral_ocr_service import MistralOCRService
 from services.document_service import DocumentService
 from services.resume_parser import ResumeParser
@@ -90,6 +90,7 @@ if file_bytes is not None and filename is not None:
                 parser = ResumeParser()
                 candidate_profile = parser.parse_resume(raw_text, doc_analysis)
                 st.session_state.candidate_profile = candidate_profile
+                st.session_state["session_reset"] = False
 
                 # 5. Database Persistence
                 try:
@@ -101,8 +102,12 @@ if file_bytes is not None and filename is not None:
                         doc_analysis_dict=doc_analysis.dict()
                     )
                     st.session_state.candidate_id = c_id
-                    with open(os.path.join("data", "active_candidate_id.txt"), "w") as f:
-                        f.write(str(c_id))
+                    try:
+                        st.query_params["cid"] = str(c_id)
+                        with open(ACTIVE_CANDIDATE_FILE, "w") as f:
+                            f.write(str(c_id))
+                    except Exception:
+                        pass
                 except Exception:
                     pass
 

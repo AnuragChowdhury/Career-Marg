@@ -6,8 +6,26 @@ one-question-at-a-time interactive interview evaluation.
 
 from typing import List, Dict, Any, Optional
 import uuid
+import re
 from models.schemas import CandidateProfile, InterviewQuestion, MockAnswerEvaluation
 from services.llm_service import LLMService
+
+
+NON_ANSWER_PATTERNS = [
+    r"\bi(?:'m| am)? not sure\b",
+    r"\bi (?:don't|dont|do not) know\b",
+    r"\bno idea\b",
+    r"\bpass\b",
+    r"\bskip\b",
+    r"\bn/?a\b",
+    r"\bidk\b",
+    r"\bdunno\b",
+    r"\bnot aware\b",
+    r"\bno experience\b",
+    r"\bhave no idea\b",
+    r"\bcan't answer\b",
+    r"\bcannot answer\b"
+]
 
 
 class InterviewService:
@@ -29,59 +47,121 @@ class InterviewService:
         5. HR Questions
         6. Skill-Gap Questions
         """
-        questions = []
         skills = candidate_profile.technical_skills or ["Python", "Machine Learning"]
-        projects = candidate_profile.projects
-        work = candidate_profile.work_experience
+        projects = candidate_profile.projects or []
+        work = candidate_profile.work_experience or []
         gaps = missing_skills or ["Docker", "MLOps"]
 
+        c_name = candidate_profile.personal_information.name if candidate_profile.personal_information else "Candidate"
+        prompt = f"""
+Given the following candidate resume details, generate 6 highly personalized interview questions across 6 specific categories.
+Candidate Profile:
+- Name: {c_name or 'Candidate'}
+- Target Role: {target_role}
+- Work Experience: {'; '.join([f'{w.job_title} at {w.company}' for w in work[:2]])}
+- Projects: {'; '.join([f'{p.title}: {p.description[:100]}' for p in projects[:2]])}
+- Missing Skills (Gaps): {', '.join(gaps[:4])}
+
+Output JSON format MUST be a list of 6 objects:
+[
+  {{
+    "category": "Technical",
+    "question": "Question text...",
+    "rationale": "Why asked...",
+    "ideal_answer_hints": ["hint 1", "hint 2"]
+  }},
+  ...
+]
+The categories MUST be exactly: "Technical", "Project-Based", "Resume-Based", "Behavioral", "HR", "Skill-Gap".
+Ensure questions specifically reference the candidate's exact projects, companies, skills, or missing skills.
+"""
+        system_prompt = "You are an executive tech interviewer crafting tailored, non-generic interview questions rooted in candidate resume facts."
+        
+        json_data = self.llm_service.generate_json(prompt, system_prompt)
+        if isinstance(json_data, list) and len(json_data) >= 5:
+            questions = []
+            for item in json_data:
+                if isinstance(item, dict) and "category" in item and "question" in item:
+                    questions.append(InterviewQuestion(
+                        id=str(uuid.uuid4())[:8],
+                        category=item.get("category", "Technical"),
+                        question=item.get("question", ""),
+                        rationale=item.get("rationale", "Assesses candidate competency."),
+                        ideal_answer_hints=item.get("ideal_answer_hints", ["Provide clear technical structure."])
+                    ))
+            if len(questions) >= 5:
+                return questions
+
+        # Dynamic Fallback based on exact candidate resume content
+        questions = []
+        
         # 1. Technical Questions
-        tech_s = skills[0] if skills else "Python"
+        tech_s1 = skills[0] if skills else "Python"
+        tech_s2 = skills[1] if len(skills) > 1 else "Machine Learning"
         questions.append(InterviewQuestion(
             id=str(uuid.uuid4())[:8],
             category="Technical",
-            question=f"In your resume, you listed expertise in {tech_s}. Can you explain how memory management or computational complexity is handled when deploying {tech_s} at scale?",
-            rationale=f"Assesses technical depth and core competency in {tech_s}.",
-            ideal_answer_hints=[f"Discuss core mechanics of {tech_s}", "Explain optimization strategies and big-O time/space complexity."]
+            question=f"In your resume, you listed expertise in {tech_s1} and {tech_s2}. Can you explain how memory management, async execution, or computational complexity is handled when deploying {tech_s1} models for {target_role} applications?",
+            rationale=f"Assesses technical depth and core competency in {tech_s1}.",
+            ideal_answer_hints=[f"Discuss core architecture of {tech_s1}", "Explain memory optimization strategies and big-O time/space complexity."]
         ))
 
         # 2. Project-Based Questions
-        proj_title = projects[0].title if projects else "your ML sentiment analysis project"
-        proj_desc = projects[0].description if projects else "machine learning classification model"
-        questions.append(InterviewQuestion(
-            id=str(uuid.uuid4())[:8],
-            category="Project-Based",
-            question=f"Regarding your project '{proj_title}': What specific model architecture or library did you choose, what evaluation metrics were used, and how did you overcome the primary bottleneck during implementation?",
-            rationale=f"Evaluates practical implementation choices and problem-solving in '{proj_title}'.",
-            ideal_answer_hints=["Explain model selection rationale", "Mention specific metrics (F1, Precision, Latency)", "Highlight architectural trade-offs."]
-        ))
+        if projects:
+            proj = projects[0]
+            proj_title = proj.title
+            proj_tech = ", ".join(proj.technologies) if proj.technologies else "specified tech stack"
+            questions.append(InterviewQuestion(
+                id=str(uuid.uuid4())[:8],
+                category="Project-Based",
+                question=f"Regarding your project '{proj_title}' built using {proj_tech}: What specific model architecture or design decision did you make, how did you handle data pipeline bottlenecks, and what metric proved success?",
+                rationale=f"Evaluates practical implementation choices and engineering trade-offs in '{proj_title}'.",
+                ideal_answer_hints=["Explain design selection rationale", "Mention specific evaluation metrics", "Highlight architectural trade-offs."]
+            ))
+        else:
+            questions.append(InterviewQuestion(
+                id=str(uuid.uuid4())[:8],
+                category="Project-Based",
+                question=f"Describe the most complex technical project you have built relevant to a {target_role}. What model or software architecture did you choose and what were the primary bottlenecks?",
+                rationale="Evaluates end-to-end engineering ownership and architectural decision making.",
+                ideal_answer_hints=["Explain architecture choice", "Specify performance metrics", "Discuss trade-offs."]
+            ))
 
         # 3. Resume-Based Questions
-        role_comp = work[0].company if work else "your recent project organization"
-        questions.append(InterviewQuestion(
-            id=str(uuid.uuid4())[:8],
-            category="Resume-Based",
-            question=f"During your experience at {role_comp}, what was the most technical responsibility you handled, and how did your contribution impact team deliverables?",
-            rationale="Verifies resume facts and candidate ownership.",
-            ideal_answer_hints=["Describe specific technical role", "Quantify business or performance impact."]
-        ))
+        if work:
+            w = work[0]
+            questions.append(InterviewQuestion(
+                id=str(uuid.uuid4())[:8],
+                category="Resume-Based",
+                question=f"During your experience as {w.job_title} at {w.company}, what was the most complex technical challenge you personally owned, and how did your work impact the team's outcome?",
+                rationale=f"Verifies resume facts and candidate ownership at {w.company}.",
+                ideal_answer_hints=["Describe specific technical responsibility", "Quantify business or performance impact."]
+            ))
+        else:
+            questions.append(InterviewQuestion(
+                id=str(uuid.uuid4())[:8],
+                category="Resume-Based",
+                question=f"Looking at your education and key achievements, which experience best demonstrates your capability to perform effectively as a {target_role}?",
+                rationale="Verifies background alignment with target role demands.",
+                ideal_answer_hints=["Highlight academic or project leadership", "Connect background to job requirements."]
+            ))
 
         # 4. Behavioral Questions
         questions.append(InterviewQuestion(
             id=str(uuid.uuid4())[:8],
             category="Behavioral",
-            question=f"Describe a situation where a technical requirement changed right before a deadline while working as a {target_role or 'engineer'}. How did you prioritize tasks and communicate with stakeholders?",
-            rationale="Evaluates adaptability, pressure management, and STAR methodology.",
-            ideal_answer_hints=["Use STAR technique (Situation, Task, Action, Result)", "Focus on proactive communication."]
+            question=f"Describe a situation where a core technical requirement changed right before a project release while preparing for {target_role} deliverables. How did you re-prioritize and communicate with your team?",
+            rationale="Evaluates adaptability, pressure management, and communication under tight deadlines.",
+            ideal_answer_hints=["Use STAR technique (Situation, Task, Action, Result)", "Focus on proactive stakeholder communication."]
         ))
 
         # 5. HR Questions
         questions.append(InterviewQuestion(
             id=str(uuid.uuid4())[:8],
             category="HR",
-            question=f"What motivates you to pursue the {target_role or 'target career'} position, and where do you see your technical trajectory evolving over the next 3 years?",
-            rationale="Assesses career vision, culture fit, and long-term commitment.",
-            ideal_answer_hints=["Align personal growth with domain advancement", "Show genuine passion for technical mastery."]
+            question=f"What key factor drives your interest in transitioning into a {target_role} position, and where do you see your technical trajectory evolving over the next 3 years?",
+            rationale="Assesses career vision, domain passion, and long-term organization fit.",
+            ideal_answer_hints=["Align personal growth with technical domain advancement", "Demonstrate genuine motivation for technical mastery."]
         ))
 
         # 6. Skill-Gap Questions
@@ -89,9 +169,9 @@ class InterviewService:
         questions.append(InterviewQuestion(
             id=str(uuid.uuid4())[:8],
             category="Skill-Gap",
-            question=f"The target role requires familiarity with {gap_s}, which isn't explicitly detailed on your resume. How would you approach learning and implementing {gap_s} if assigned to a live project tomorrow?",
-            rationale=f"Evaluates learning agility and willingness to address skill gap in {gap_s}.",
-            ideal_answer_hints=[f"Outline fast-track learning strategy for {gap_s}", "Reference past experience rapidly learning new frameworks."]
+            question=f"The target {target_role} role requires competency in {gap_s}, which is an identified skill gap. How would you approach rapidly learning and implementing {gap_s} if assigned to a production task tomorrow?",
+            rationale=f"Evaluates learning agility and willingness to bridge the gap in {gap_s}.",
+            ideal_answer_hints=[f"Outline fast-track learning strategy for {gap_s}", "Reference past experience learning new frameworks under deadline."]
         ))
 
         return questions
@@ -106,22 +186,54 @@ class InterviewService:
         Evaluates user answer across 4 dimensions: Relevance, Technical Correctness, Completeness, Clarity.
         Generates constructive feedback, missing key points, and dynamic follow-up question.
         """
-        ans_len = len(user_answer.strip().split())
-        
+        raw_ans = user_answer.strip()
+        ans_lower = raw_ans.lower()
+        ans_len = len(raw_ans.split())
+
+        # Detect non-answers or admissions of ignorance
+        is_non_answer = False
+        for pattern in NON_ANSWER_PATTERNS:
+            if re.search(pattern, ans_lower):
+                is_non_answer = True
+                break
+
+        if ans_len < 3 and not any(kw in ans_lower for kw in ["yes", "no", "sql", "aws", "git", "api"]):
+            is_non_answer = True
+
+        if is_non_answer:
+            return MockAnswerEvaluation(
+                question_id=question.id,
+                question_text=question.question,
+                user_answer=user_answer,
+                relevance_score=5.0,
+                technical_correctness_score=0.0,
+                completeness_score=0.0,
+                clarity_score=10.0,
+                overall_answer_score=3.8,
+                feedback="You indicated that you are not sure or do not know the answer. While honesty is appreciated in interviews, a low score is recorded because no technical information was provided. In real interviews, state your current understanding of related concepts and explain how you would investigate and solve the problem.",
+                strengths=["Honesty regarding knowledge limits."],
+                missing_key_points=[
+                    "Core technical concept explanation",
+                    "Methodology or algorithmic steps",
+                    "Problem-solving framework when encountering unfamiliar topics"
+                ],
+                follow_up_question=f"If you were asked to research {question.category.lower()} concepts for a production task tomorrow, what specific resources or steps would you take?"
+            )
+
         if ans_len < 10:
             return MockAnswerEvaluation(
                 question_id=question.id,
                 question_text=question.question,
                 user_answer=user_answer,
-                relevance_score=40.0,
-                technical_correctness_score=40.0,
-                completeness_score=30.0,
-                clarity_score=50.0,
-                overall_answer_score=40.0,
-                feedback="Your answer is very brief. Expand your response with specific technical details, methodology, and outcome.",
-                strengths=["Direct response."],
+                relevance_score=35.0,
+                technical_correctness_score=30.0,
+                completeness_score=20.0,
+                clarity_score=45.0,
+                overall_answer_score=32.5,
+                feedback="Your answer is very brief. Expand your response with specific technical details, implementation steps, and concrete outcomes.",
+                strengths=["Direct response attempt."],
                 missing_key_points=["Detailed explanation of implementation", "Quantified results or architectural details"],
-                follow_up_question=f"Can you elaborate further on the technical details of {question.category.lower()} execution?"
+                follow_up_question=f"Can you elaborate further on the technical details of your {question.category.lower()} approach?"
             )
 
         # Standard score heuristics
@@ -130,7 +242,7 @@ class InterviewService:
         comp_score = 82.0
         clar_score = 88.0
 
-        if any(keyword in user_answer.lower() for keyword in ["because", "metric", "improved", "architecture", "tradeoff", "using", "designed"]):
+        if any(keyword in ans_lower for keyword in ["because", "metric", "improved", "architecture", "tradeoff", "using", "designed", "optimized"]):
             tech_score += 10.0
             comp_score += 8.0
 
@@ -151,7 +263,7 @@ class InterviewService:
             missing_points.append("Quantifiable impact metrics (e.g. % accuracy boost or latency reduction).")
             missing_points.append("Mentioning alternative trade-offs considered during technical decision making.")
 
-        follow_up = f"That's a solid explanation. How would your approach change if data scale or request volume increased by 10x?"
+        follow_up = "That's a solid explanation. How would your approach change if data scale or request volume increased by 10x?"
 
         return MockAnswerEvaluation(
             question_id=question.id,
@@ -193,7 +305,6 @@ class InterviewService:
         else:
             readiness = "Needs Structured Practice"
 
-        # Aggregate unique strengths and missing points
         all_strengths = []
         for h in history:
             all_strengths.extend(h.strengths)
@@ -204,7 +315,6 @@ class InterviewService:
             all_missing.extend(h.missing_key_points)
         unique_missing = sorted(list(set(all_missing)))[:4]
 
-        # Executive digest sentence
         digest = (
             f"Candidate completed {len(history)} mock interview questions with an average evaluation score of {avg_score:.1f}%. "
             f"Status: {readiness}. "
@@ -225,4 +335,3 @@ class InterviewService:
             "areas_for_improvement": unique_missing or ["Add measurable metrics"],
             "action_items": action_items
         }
-

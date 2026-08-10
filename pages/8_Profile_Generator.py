@@ -23,7 +23,7 @@ st.info("🔒 **Strict Grounding Enforcement**: All generated branding text is d
 
 target_role = st.session_state.target_job_role or "Machine Learning Engineer"
 
-if st.button("🚀 Generate Grounded Profile Content", type="primary") or not st.session_state.profile_generated:
+if st.button("🚀 Generate Grounded Profile Content", type="primary"):
     with st.spinner("Synthesizing grounded professional branding materials..."):
         prof_svc = ProfileService()
         res = prof_svc.generate_professional_profile(
@@ -32,6 +32,9 @@ if st.button("🚀 Generate Grounded Profile Content", type="primary") or not st
         )
         st.session_state.profile_generated = res
         st.success("✓ Professional branding content generated!")
+
+if not st.session_state.profile_generated:
+    st.info("👇 Click the **'Generate Grounded Profile Content'** button above to generate professional summaries, LinkedIn headlines, bios, and portfolio descriptions.")
 
 # Render Content Sections
 if st.session_state.profile_generated:
