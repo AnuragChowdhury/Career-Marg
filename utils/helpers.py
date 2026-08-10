@@ -4,8 +4,13 @@ File validation, text cleanups, and Streamlit session state management.
 """
 
 import os
+import sys
 import re
 from typing import Tuple, List, Dict, Any
+
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
 
 ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".docx", ".txt"}
 MAX_FILE_SIZE_MB = 15.0
@@ -13,8 +18,7 @@ MAX_FILE_SIZE_MB = 15.0
 # Resolve the active candidate file path — prefer data/ but fall back to /tmp/ on Streamlit Cloud
 def _resolve_candidate_file() -> str:
     """Returns a writable path for the active candidate ID file."""
-    _proj_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    _default_dir = os.path.join(_proj_root, "data")
+    _default_dir = os.path.join(_PROJECT_ROOT, "data")
     try:
         os.makedirs(_default_dir, exist_ok=True)
         _test = os.path.join(_default_dir, ".write_test")
