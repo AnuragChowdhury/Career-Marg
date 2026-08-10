@@ -1296,21 +1296,26 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
 
     # Render Navbar if active_page is provided
     if active_page:
-        # Priority: query_params (URL) > session_state > file fallback
-        # Reading from query_params first is most reliable on Streamlit Cloud
-        cid = st.query_params.get("cid") or st.session_state.get("candidate_id")
+        # Resolve cid with full defensive wrapping — cid must always be defined
+        cid = None
+        try:
+            # Priority 1: URL query param (most reliable across pages on Streamlit Cloud)
+            _qp_cid = st.query_params.get("cid")
+            if _qp_cid:
+                cid = str(_qp_cid)
 
-        # If cid came from session state but not URL, push it to URL so links carry it
-        if not st.query_params.get("cid") and st.session_state.get("candidate_id"):
-            try:
-                st.query_params["cid"] = str(st.session_state["candidate_id"])
-                cid = str(st.session_state["candidate_id"])
-            except Exception:
-                pass
+            # Priority 2: session state (reliable within a single worker session)
+            if not cid:
+                _ss_cid = st.session_state.get("candidate_id")
+                if _ss_cid:
+                    cid = str(_ss_cid)
+                    try:
+                        st.query_params["cid"] = cid
+                    except Exception:
+                        pass
 
-        # Last resort: read from file (best-effort for Streamlit Cloud ephemeral FS)
-        if not cid and os.path.exists(ACTIVE_CANDIDATE_FILE):
-            try:
+            # Priority 3: file fallback (best-effort for same-worker page loads)
+            if not cid and os.path.exists(ACTIVE_CANDIDATE_FILE):
                 with open(ACTIVE_CANDIDATE_FILE, "r") as _f:
                     _file_cid = _f.read().strip()
                 if _file_cid and _file_cid.isdigit():
@@ -1319,8 +1324,8 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
                         st.query_params["cid"] = cid
                     except Exception:
                         pass
-            except Exception:
-                pass
+        except Exception:
+            cid = None
 
         pages = [
             {"label": "Home", "url": "/", "key": "home"},
