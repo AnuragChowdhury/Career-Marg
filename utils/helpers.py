@@ -131,6 +131,20 @@ def init_session_state(st_session_state: Any) -> None:
                     except Exception:
                         pass
 
+                    # Always sync cid to query_params so navbar links carry it on cloud
+                    try:
+                        st.query_params["cid"] = str(rec.id)
+                    except Exception:
+                        pass
+
+                    # Also write to file as backup (best-effort)
+                    try:
+                        os.makedirs(os.path.dirname(ACTIVE_CANDIDATE_FILE), exist_ok=True)
+                        with open(ACTIVE_CANDIDATE_FILE, "w") as _f:
+                            _f.write(str(rec.id))
+                    except Exception:
+                        pass
+
                     job_rec = db_session.query(JobAnalysisRecord).filter(
                         JobAnalysisRecord.candidate_id == rec.id
                     ).order_by(JobAnalysisRecord.id.desc()).first()
@@ -1282,10 +1296,29 @@ def apply_custom_style(active_page: str = None, hide_sidebar: bool = True) -> No
 
     # Render Navbar if active_page is provided
     if active_page:
-        cid = st.session_state.get("candidate_id") or st.query_params.get("cid")
-        if st.session_state.get("candidate_id") and not st.query_params.get("cid"):
+        # Priority: query_params (URL) > session_state > file fallback
+        # Reading from query_params first is most reliable on Streamlit Cloud
+        cid = st.query_params.get("cid") or st.session_state.get("candidate_id")
+
+        # If cid came from session state but not URL, push it to URL so links carry it
+        if not st.query_params.get("cid") and st.session_state.get("candidate_id"):
             try:
                 st.query_params["cid"] = str(st.session_state["candidate_id"])
+                cid = str(st.session_state["candidate_id"])
+            except Exception:
+                pass
+
+        # Last resort: read from file (best-effort for Streamlit Cloud ephemeral FS)
+        if not cid and os.path.exists(ACTIVE_CANDIDATE_FILE):
+            try:
+                with open(ACTIVE_CANDIDATE_FILE, "r") as _f:
+                    _file_cid = _f.read().strip()
+                if _file_cid and _file_cid.isdigit():
+                    cid = _file_cid
+                    try:
+                        st.query_params["cid"] = cid
+                    except Exception:
+                        pass
             except Exception:
                 pass
 
