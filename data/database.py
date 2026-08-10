@@ -54,7 +54,22 @@ class InterviewRecord(Base):
 
 
 # Global Engine & Session Maker Initialization
-DATABASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+# Use /tmp/ on Streamlit Cloud (read-only source mount) and data/ locally
+def _resolve_db_dir() -> str:
+    """Returns a writable directory for the database, preferring data/ but falling back to /tmp/."""
+    default_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+    try:
+        os.makedirs(default_dir, exist_ok=True)
+        _test = os.path.join(default_dir, ".write_test")
+        with open(_test, "w") as _f:
+            _f.write("ok")
+        os.remove(_test)
+        return default_dir
+    except (OSError, PermissionError):
+        # Streamlit Cloud: /mount/src/ is read-only, use /tmp/ instead
+        return "/tmp"
+
+DATABASE_DIR = _resolve_db_dir()
 os.makedirs(DATABASE_DIR, exist_ok=True)
 DATABASE_PATH = os.path.join(DATABASE_DIR, "careermarg.db")
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"

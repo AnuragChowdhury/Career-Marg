@@ -93,7 +93,9 @@ if file_bytes is not None and filename is not None:
                 st.session_state["session_reset"] = False
 
                 # 5. Database Persistence
+                _db_error = None
                 try:
+                    from data.database import DATABASE_PATH
                     c_id = save_candidate_profile(
                         filename=filename,
                         file_type=doc_analysis.file_type,
@@ -112,8 +114,9 @@ if file_bytes is not None and filename is not None:
                             f.write(str(c_id))
                     except Exception:
                         pass
-                except Exception:
-                    pass
+                except Exception as _e:
+                    _db_error = str(_e)
+                    st.session_state["_db_error"] = _db_error
 
                 # Flag to show success toasts after rerun
                 st.session_state["_resume_just_processed"] = True
@@ -127,8 +130,15 @@ if file_bytes is not None and filename is not None:
 if st.session_state.pop("_resume_just_processed", False):
     st.toast("🔍 Layout analysis complete!", icon="👀")
     st.toast("🧬 Executive profile parsed successfully!", icon="👤")
-    st.toast("✅ Candidate database synchronized!", icon="💾")
-    st.success("🎉 Resume analysis complete! You can now navigate to any page using the top navbar.")
+    _db_err = st.session_state.pop("_db_error", None)
+    if _db_err:
+        st.error(f"⚠️ Database save failed: {_db_err}")
+    else:
+        from data.database import DATABASE_PATH
+        st.toast("✅ Candidate database synchronized!", icon="💾")
+        st.success(f"🎉 Resume analysis complete! DB: `{DATABASE_PATH}` | cid: `{st.session_state.get('candidate_id')}` | Navigate using the top navbar.")
+
+
 
 
 

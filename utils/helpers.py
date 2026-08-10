@@ -10,10 +10,23 @@ from typing import Tuple, List, Dict, Any
 ALLOWED_EXTENSIONS = {".pdf", ".jpg", ".jpeg", ".png", ".docx", ".txt"}
 MAX_FILE_SIZE_MB = 15.0
 
-# Absolute path to active_candidate_id.txt, derived from project root
-# This ensures it resolves correctly regardless of which Streamlit page triggers the import
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ACTIVE_CANDIDATE_FILE = os.path.join(_PROJECT_ROOT, "data", "active_candidate_id.txt")
+# Resolve the active candidate file path — prefer data/ but fall back to /tmp/ on Streamlit Cloud
+def _resolve_candidate_file() -> str:
+    """Returns a writable path for the active candidate ID file."""
+    _proj_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    _default_dir = os.path.join(_proj_root, "data")
+    try:
+        os.makedirs(_default_dir, exist_ok=True)
+        _test = os.path.join(_default_dir, ".write_test")
+        with open(_test, "w") as _f:
+            _f.write("ok")
+        os.remove(_test)
+        return os.path.join(_default_dir, "active_candidate_id.txt")
+    except (OSError, PermissionError):
+        return "/tmp/active_candidate_id.txt"
+
+ACTIVE_CANDIDATE_FILE = _resolve_candidate_file()
+
 
 
 def validate_uploaded_file(filename: str, file_size_bytes: int) -> Tuple[bool, str]:
