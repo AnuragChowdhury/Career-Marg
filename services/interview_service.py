@@ -109,8 +109,9 @@ Ensure questions specifically reference the candidate's exact projects, companie
         # 2. Project-Based Questions
         if projects:
             proj = projects[0]
-            proj_title = proj.title
-            proj_tech = ", ".join(proj.technologies) if proj.technologies else "specified tech stack"
+            proj_title = getattr(proj, "title", None) or (proj.get("title") if isinstance(proj, dict) else None) or "Featured Project"
+            tech_list = getattr(proj, "technologies_used", None) or getattr(proj, "technologies", None) or (proj.get("technologies_used") if isinstance(proj, dict) else None) or []
+            proj_tech = ", ".join(tech_list) if tech_list else "specified tech stack"
             questions.append(InterviewQuestion(
                 id=str(uuid.uuid4())[:8],
                 category="Project-Based",
@@ -130,11 +131,13 @@ Ensure questions specifically reference the candidate's exact projects, companie
         # 3. Resume-Based Questions
         if work:
             w = work[0]
+            j_title = getattr(w, "job_title", None) or (w.get("job_title") if isinstance(w, dict) else None) or "Engineer"
+            comp = getattr(w, "company", None) or (w.get("company") if isinstance(w, dict) else None) or "your previous role"
             questions.append(InterviewQuestion(
                 id=str(uuid.uuid4())[:8],
                 category="Resume-Based",
-                question=f"During your experience as {w.job_title} at {w.company}, what was the most complex technical challenge you personally owned, and how did your work impact the team's outcome?",
-                rationale=f"Verifies resume facts and candidate ownership at {w.company}.",
+                question=f"During your experience as {j_title} at {comp}, what was the most complex technical challenge you personally owned, and how did your work impact the team's outcome?",
+                rationale=f"Verifies resume facts and candidate ownership at {comp}.",
                 ideal_answer_hints=["Describe specific technical responsibility", "Quantify business or performance impact."]
             ))
         else:
